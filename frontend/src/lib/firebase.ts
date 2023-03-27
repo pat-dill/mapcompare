@@ -17,5 +17,10 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+try {
+    const app = initializeApp(firebaseConfig);
+    if (!location.host.includes("localhost")) {
+        const analytics = getAnalytics(app);
+    }
+
+} catch {}
