@@ -6,7 +6,7 @@ import clsx from "clsx";
 const styles = {
     "Satellite": "mapbox://styles/paricdil/cl6ie0wc9001q15nzmfsmwj80",
     "Streets": "mapbox://styles/mapbox/streets-v12",
-    "Traffic": "mapbox://styles/mapbox/navigation-day-v1"
+    "Transportation": "mapbox://styles/paricdil/cljem5ocn001801qu6tjd7gid"
 }
 
 function App() {
