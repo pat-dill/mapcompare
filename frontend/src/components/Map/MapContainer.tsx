@@ -1,24 +1,28 @@
-import React, {Ref, useEffect, useRef, useState} from "react";
-import Map, {MapRef, NavigationControl, ViewState} from "react-map-gl";
-import {mapboxToken} from "../../config";
+import React, { Ref, useEffect, useRef, useState } from "react";
+import Map, { ControlPosition, MapRef, NavigationControl, ViewState } from "react-map-gl";
+import { mapboxToken } from "../../config";
 import GeocoderControl from "./GeoCoder";
 
 const degToRad = (deg: number) => (deg * Math.PI) / 180.0;
 
-export function MapContainer({viewState, onMove, mapStyle, mapRef}: {
-    viewState: Partial<ViewState>,
-    onMove: (v: ViewState) => void,
-    mapStyle: string,
-    mapRef?: Ref<MapRef>
+export function MapContainer({
+    viewState,
+    onMove,
+    mapStyle,
+    mapRef,
+    controlsPos = "top-right",
+}: {
+    viewState: Partial<ViewState>;
+    onMove: (v: ViewState) => void;
+    mapStyle: string;
+    mapRef?: Ref<MapRef>;
+    controlsPos?: ControlPosition;
 }) {
     const [size, setSize] = useState([600, 600]);
     const containerRef = useRef<HTMLDivElement>(null);
     const onResize = () => {
-        setSize([
-            containerRef.current?.offsetWidth || 600,
-            containerRef.current?.offsetHeight || 600,
-        ])
-    }
+        setSize([containerRef.current?.offsetWidth || 600, containerRef.current?.offsetHeight || 600]);
+    };
 
     useEffect(() => {
         onResize();
@@ -44,55 +48,67 @@ export function MapContainer({viewState, onMove, mapStyle, mapRef}: {
 
         // interpolate the factor to 1 if zoom level is between 5 and 6,
         // these are the zoom levels where map transitions from globe to mercator
-        let alpha = (clamp(view.zoom, 5.5, 6.5) - 5.5) / (6.5-5.5);
+        let alpha = (clamp(view.zoom, 5.5, 6.5) - 5.5) / (6.5 - 5.5);
         factor = (factor - 1) * alpha + 1;
 
         let diff = Math.log2(factor);
         return (view.zoom || 0) + diff;
-    }
+    };
 
     const [myViewState, setMyViewState] = useState<Partial<ViewState>>({
         longitude: 0,
         latitude: 0,
-        zoom: 2
+        zoom: 2,
     });
 
     let combinedViewState = {
         ...myViewState,
-        ...viewState
-    }
+        ...viewState,
+    };
 
-    return <div
-        ref={containerRef}
-        style={{width: "100%", height: "100%"}}
-    >
-        <Map
-            viewState={{
-                ...combinedViewState,
-                zoom: transformZoom(combinedViewState as ViewState, true),
-                width: size[0], height: size[1]
-            } as ViewState & { width: number, height: number }}
-            onMove={evt => {
-                setMyViewState(evt.viewState);
+    const [reloadControls, setReloadControls] = useState(false);
+    useEffect(() => {
+        if (reloadControls) {
+            setReloadControls(false);
+        }
+    }, [reloadControls]);
+    useEffect(() => {
+        setReloadControls(true);
+    }, [controlsPos]);
 
-                onMove({
-                    ...evt.viewState,
-                    zoom: transformZoom(evt.viewState, false)
-                });
-            }}
-            style={{
-                width: size[0],
-                height: size[1]
-            }}
-            projection="globe"
-            mapStyle={mapStyle}
-            mapboxAccessToken={mapboxToken}
-            ref={mapRef}
-        >
-            <GeocoderControl
-                mapboxAccessToken={mapboxToken} position="top-right"
-            />
-            <NavigationControl position="top-right"/>
-        </Map>
-    </div>
+    return (
+        <div ref={containerRef} style={{ width: "100%", height: "100%" }}>
+            <Map
+                viewState={
+                    {
+                        ...combinedViewState,
+                        zoom: transformZoom(combinedViewState as ViewState, true),
+                        width: size[0],
+                        height: size[1],
+                    } as ViewState & { width: number; height: number }
+                }
+                onMove={(evt) => {
+                    setMyViewState(evt.viewState);
+
+                    onMove({
+                        ...evt.viewState,
+                        zoom: transformZoom(evt.viewState, false),
+                    });
+                }}
+                style={{
+                    width: size[0],
+                    height: size[1],
+                }}
+                projection="globe"
+                mapStyle={mapStyle}
+                mapboxAccessToken={mapboxToken}
+                ref={mapRef}
+            >
+                {!reloadControls && (
+                    <GeocoderControl mapboxAccessToken={mapboxToken} position={controlsPos} />
+                )}
+                {!reloadControls && <NavigationControl position={controlsPos} />}
+            </Map>
+        </div>
+    );
 }

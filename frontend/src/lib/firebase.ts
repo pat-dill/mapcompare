@@ -13,7 +13,7 @@ const firebaseConfig = {
     storageBucket: "map-compare-f9233.appspot.com",
     messagingSenderId: "67341305393",
     appId: "1:67341305393:web:cffbb0b6756032121c3710",
-    measurementId: "G-XFW4PG8KRW"
+    measurementId: "G-XFW4PG8KRW",
 };
 
 // Initialize Firebase
@@ -22,5 +22,4 @@ try {
     if (!location.host.includes("localhost")) {
         const analytics = getAnalytics(app);
     }
-
 } catch {}
