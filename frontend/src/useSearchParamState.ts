@@ -15,7 +15,6 @@ export function useSearchParamState<T>(paramName: string, defaultValue?: T) {
     const [searchParams, setSearchParams] = useSearchParams();
 
     const currentState = (searchParams.get(paramName) as T) ?? defaultValue;
-
     const setState: Dispatch<SetSearchParamStateAction<T>> = (value) => {
         const newParams = new URLSearchParams(searchParams);
         let newValue: T | undefined;
