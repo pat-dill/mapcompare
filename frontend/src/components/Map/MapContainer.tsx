@@ -105,9 +105,11 @@ export function MapContainer({
                 ref={mapRef}
             >
                 {!reloadControls && (
-                    <GeocoderControl mapboxAccessToken={mapboxToken} position={controlsPos} />
+                    <>
+                        <GeocoderControl mapboxAccessToken={mapboxToken} position={controlsPos} />
+                        <NavigationControl position={controlsPos} />
+                    </>
                 )}
-                {!reloadControls && <NavigationControl position={controlsPos} />}
             </Map>
         </div>
     );

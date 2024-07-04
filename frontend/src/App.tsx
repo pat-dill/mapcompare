@@ -6,15 +6,18 @@ import { useSearchParams } from "react-router-dom";
 import { useAnimationFrame, useSpring, useSyncedInterval } from "pat-web-utils";
 import { useIsMobile } from "./useIsMobile";
 import { useClickAnyWhere } from "usehooks-ts";
+import { useSearchParamState } from "./useSearchParamState";
 
 const styles = {
     Satellite: "mapbox://styles/paricdil/cl6ie0wc9001q15nzmfsmwj80",
-    Streets: "mapbox://styles/mapbox/streets-v12",
     Transportation: "mapbox://styles/paricdil/cljem5ocn001801qu6tjd7gid",
+    Streets: "mapbox://styles/mapbox/streets-v12",
+    Traffic: "mapbox://styles/mapbox/navigation-day-v1",
 };
 
 function App() {
-    const [style, setStyle] = useState(styles["Satellite"]);
+    const [styleId, setStyleId] = useSearchParamState<keyof typeof styles>("style", "Satellite");
+    const style = styles[styleId];
     const [fullscreen, setFullscreen] = useState(false);
     const [searchParams, setSearchParams] = useSearchParams();
 
@@ -115,14 +118,14 @@ function App() {
             >
                 <select
                     className="p-2 rounded-lg bg-white text-gray-800 shadow-sm mapboxgl-ctrl"
-                    value={style}
+                    value={styleId}
                     onChange={(e) => {
-                        setStyle(e.target.value);
+                        setStyleId(e.target.value as keyof typeof styles);
                     }}
                 >
                     {Object.entries(styles).map(([name, url]) => {
                         return (
-                            <option label={name} value={url}>
+                            <option label={name} value={name}>
                                 {name}
                             </option>
                         );
