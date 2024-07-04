@@ -11,7 +11,7 @@ export function useSearchParamState<T extends string>(
     paramName: string
 ): [T | undefined, Dispatch<SetSearchParamStateAction<T | undefined>>];
 
-export function useSearchParamState<T>(paramName: string, defaultValue?: T) {
+export function useSearchParamState<T extends string>(paramName: string, defaultValue?: T) {
     const [searchParams, setSearchParams] = useSearchParams();
 
     const currentState = (searchParams.get(paramName) as T) ?? defaultValue;
