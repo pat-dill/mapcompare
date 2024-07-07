@@ -16,20 +16,21 @@ export function useSearchParamState<T extends string>(paramName: string, default
 
     const currentState = (searchParams.get(paramName) as T | null) ?? defaultValue;
     const setState: Dispatch<SetSearchParamStateAction<T>> = (value) => {
-        const newParams = new URLSearchParams(window.location.search);
-        let newValue: T | undefined;
-        if (typeof value === "function") {
-            const cb = value as (prevState?: T) => T | undefined;
-            newValue = cb(currentState);
-        } else {
-            newValue = value;
-        }
-        if (newValue == undefined || newValue === defaultValue) {
-            newParams.delete(paramName);
-        } else {
-            newParams.set(paramName, newValue as string);
-        }
-        setSearchParams(newParams);
+        setSearchParams((params) => {
+            let newValue: T | undefined;
+            if (typeof value === "function") {
+                const cb = value as (prevState?: T) => T | undefined;
+                newValue = cb(currentState);
+            } else {
+                newValue = value;
+            }
+            if (newValue == undefined || newValue === defaultValue) {
+                params.delete(paramName);
+            } else {
+                params.set(paramName, newValue as string);
+            }
+            return params;
+        });
     };
 
     return [currentState, setState];

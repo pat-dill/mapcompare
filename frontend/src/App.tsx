@@ -7,6 +7,8 @@ import { useAnimationFrame, useSpring, useSyncedInterval } from "pat-web-utils";
 import { useIsMobile } from "./useIsMobile";
 import { useClickAnyWhere } from "usehooks-ts";
 import { useSearchParamState } from "./useSearchParamState";
+import FullScreenButton from "./components/Map/FullScreenButton";
+import ShareButton from "./components/Map/ShareButton";
 
 const styles = {
     Satellite: "mapbox://styles/paricdil/cl6ie0wc9001q15nzmfsmwj80",
@@ -51,6 +53,29 @@ function App() {
             bearing:
                 searchParams.get("rightBearing") ? parseFloat(searchParams.get("rightBearing") as string) : 0,
         });
+
+        if (!searchParams.has("leftLat") && !searchParams.has("leftLng")) {
+            navigator.geolocation.getCurrentPosition(
+                ({ coords }) => {
+                    setLeftState({
+                        latitude: coords.latitude,
+                        longitude: coords.longitude,
+                        bearing: 0,
+                    });
+                    setRightState({
+                        // NYC
+                        latitude: 40.7128,
+                        longitude: -74.006,
+                        bearing: 0,
+                    });
+                    setSharedState((prev) => ({ ...prev, zoom: 10 }));
+                },
+                console.warn,
+                {
+                    maximumAge: Infinity,
+                }
+            );
+        }
     }, []);
 
     useSyncedInterval(() => {
@@ -133,26 +158,19 @@ function App() {
                 </select>
             </div>
 
-            <div className={clsx("absolute bottom-3 right-3 lg:bottom-5 lg:right-5 z-50", "hidden md:block")}>
-                <button
-                    className="bg-black/70 p-2 text-white w-10 h-10 flex justify-center items-center"
-                    onClick={async () => {
-                        if (fullscreen) {
-                            await document.exitFullscreen();
-                        } else {
-                            await document.body.requestFullscreen();
-                        }
+            <div
+                className={clsx(
+                    "controls absolute bottom-3 right-3 lg:bottom-5 lg:right-5 z-50",
+                    "flex flex-col gap-2"
+                )}
+            >
+                <ShareButton url={""} className="bg-white text-black rounded-md" />
 
-                        setFullscreen(!fullscreen);
-                    }}
-                >
-                    <i
-                        className={clsx({
-                            "fa fa-down-left-and-up-right-to-center": fullscreen,
-                            "fa fa-up-right-and-down-left-from-center": !fullscreen,
-                        })}
-                    />
-                </button>
+                <FullScreenButton
+                    fullscreen={fullscreen}
+                    setFullscreen={setFullscreen}
+                    className="bg-white text-black rounded-md"
+                />
             </div>
 
             <div
@@ -210,7 +228,7 @@ function App() {
             </div>
 
             <style>{`
-                .mapboxgl-ctrl {
+                .mapboxgl-ctrl, .controls {
                     ${controlsOpacity >= 0.01 ? `opacity: ${controlsOpacity};` : "display: none"}
                 }
         `}</style>
