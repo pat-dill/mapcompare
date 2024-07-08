@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { ViewState } from "react-map-gl";
-import { MapContainer } from "./components/Map/MapContainer";
+import { MapContainer } from "./components/map/MapContainer";
 import clsx from "clsx";
 import { useSearchParams } from "react-router-dom";
 import { useAnimationFrame, useSpring, useSyncedInterval } from "pat-web-utils";
 import { useIsMobile } from "./useIsMobile";
 import { useClickAnyWhere } from "usehooks-ts";
 import { useSearchParamState } from "./useSearchParamState";
-import FullScreenButton from "./components/Map/FullScreenButton";
-import ShareButton from "./components/Map/ShareButton";
+import FullScreenButton from "./components/buttons/FullScreenButton";
+import ShareButton from "./components/buttons/ShareButton";
+import ScreenshotButton from "./components/buttons/ScreenshotButton";
 
 const styles = {
     Satellite: "mapbox://styles/paricdil/cl6ie0wc9001q15nzmfsmwj80",
@@ -164,13 +165,15 @@ function App() {
                     "flex flex-col gap-2"
                 )}
             >
-                <ShareButton url={""} className="bg-white text-black rounded-md" />
+                <ShareButton className="bg-white text-black rounded-md" />
 
-                <FullScreenButton
-                    fullscreen={fullscreen}
-                    setFullscreen={setFullscreen}
-                    className="bg-white text-black rounded-md"
-                />
+                {document.fullscreenEnabled && (
+                    <FullScreenButton
+                        fullscreen={fullscreen}
+                        setFullscreen={setFullscreen}
+                        className="bg-white text-black rounded-md"
+                    />
+                )}
             </div>
 
             <div
@@ -179,7 +182,7 @@ function App() {
                     height: "var(--app-height)",
                 }}
                 className={clsx(
-                    "grid grid-rows-2 grid-cols-1 sm:grid-rows-1 sm:grid-cols-2",
+                    "grid grid-rows-2 grid-cols-1 md:grid-rows-1 md:grid-cols-2",
                     "bg-black p-2 gap-2"
                 )}
             >

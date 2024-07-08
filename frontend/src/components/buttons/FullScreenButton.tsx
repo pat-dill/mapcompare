@@ -14,13 +14,17 @@ export default function FullScreenButton({
         <button
             className={clsx("p-2 w-10 h-10 flex justify-center items-center", className)}
             onClick={async () => {
-                if (fullscreen) {
-                    await document.exitFullscreen();
-                } else {
-                    await document.body.requestFullscreen();
+                try {
+                    if (document.fullscreenElement) {
+                        await document.exitFullscreen();
+                    } else {
+                        await document.body.requestFullscreen();
+                    }
+                } catch (e) {
+                    console.warn(e);
                 }
 
-                setFullscreen(!fullscreen);
+                setFullscreen(!!document.fullscreenElement);
             }}
         >
             <i
