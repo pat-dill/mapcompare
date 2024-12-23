@@ -9,7 +9,7 @@ import { useClickAnyWhere } from "usehooks-ts";
 import { useSearchParamState } from "./useSearchParamState";
 import FullScreenButton from "./components/buttons/FullScreenButton";
 import ShareButton from "./components/buttons/ShareButton";
-import ScreenshotButton from "./components/buttons/ScreenshotButton";
+import ToggleButton from "./components/buttons/ToggleButton";
 
 const styles = {
     Satellite: "mapbox://styles/paricdil/cl6ie0wc9001q15nzmfsmwj80",
@@ -27,6 +27,8 @@ function App() {
     const [sharedState, setSharedState] = useState<Partial<ViewState>>({});
     const [leftState, setLeftState] = useState<Partial<ViewState>>({});
     const [rightState, setRightState] = useState<Partial<ViewState>>({});
+
+    const [overlayMode, setOverlayMode] = useState(false);
 
     useEffect(() => {
         const appHeight = () => {
@@ -174,6 +176,12 @@ function App() {
                         className="bg-white text-black rounded-md"
                     />
                 )}
+
+                <ToggleButton
+                    value={overlayMode}
+                    setValue={setOverlayMode}
+                    className="bg-white text-black rounded-md"
+                />
             </div>
 
             <div
@@ -182,11 +190,17 @@ function App() {
                     height: "var(--app-height)",
                 }}
                 className={clsx(
-                    "grid grid-rows-2 grid-cols-1 md:grid-rows-1 md:grid-cols-2",
+                    {
+                        "grid grid-rows-2 grid-cols-1 md:grid-rows-1 md:grid-cols-2": !overlayMode,
+                        "absolute top-0 left-0 w-full h-full": overlayMode,
+                    },
                     "bg-black p-2 gap-2"
                 )}
             >
-                <div className="rounded-lg overflow-hidden">
+                <div className={clsx(
+                    "rounded-lg overflow-hidden mix-blend-difference",
+                    {"absolute top-0 left-0 w-full h-full": overlayMode}
+                )}>
                     <MapContainer
                         mapStyle={style}
                         viewState={{
@@ -207,7 +221,10 @@ function App() {
                         controlsPos={isMobile ? "bottom-left" : "top-left"}
                     />
                 </div>
-                <div className="rounded-lg overflow-hidden">
+                <div className={clsx(
+                    "rounded-lg overflow-hidden mix-blend-difference",
+                    {"absolute top-0 left-0 w-full h-full": overlayMode}
+                )}>
                     <MapContainer
                         mapStyle={style}
                         viewState={{
@@ -232,7 +249,7 @@ function App() {
 
             <style>{`
                 .mapboxgl-ctrl, .controls {
-                    ${controlsOpacity >= 0.01 ? `opacity: ${controlsOpacity};` : "display: none"}
+                    ${controlsOpacity >= 0.01 ? `opacity: ${controlsOpacity}` : "display: none"};
                 }
         `}</style>
         </div>
